@@ -1,0 +1,391 @@
+##Metatranscriptomes control => C1_3 (labeled as C1_5) (uploaded)
+								C3_2 (uploaded)
+								C4_5 (uploaded0
+								C5_5 (uploaded)
+##Metatranscriptomes warmed => W1_3 (uploaded)
+							   W3_1 (uploaded)
+							   W4_3 (uploaded)
+							   W5_5 (uploaded)
+							   
+##Processing of meta-transcriptomes from AK
+##Compare transcription of single species 
+##objective: map control and warmed metatranscriptomes to single whole genome 
+
+##module load linuxbrew/colsa
+
+##First unzip .gz files 
+
+gunzip < C1_3.fastq.gz > C1_3.fastq #metatranscriptomes
+gunzip < W1_3.fastq.gz > W1_3.fastq #metatrasncriptomes
+
+#fastQC of samples 
+
+module load linuxbrew/colsa
+
+################################################################################
+##step 2
+################################################################################
+#separate files into r1 and r2
+
+paste - - - - < C1_3.fastq \
+| tee >(awk 'BEGIN{FS="\t"; OFS="\n"} {if (match($1, " 1:N")) print $1,$2,$3,$4}' > C1_3.r1.fq ) \
+| awk 'BEGIN{FS="\t"; OFS="\n"} {if (match($1, " 2:N")) print $1,$2,$3,$4}' > C1_3.r2.fq
+
+paste - - - - < W1_3.fastq \
+| tee >(awk 'BEGIN{FS="\t"; OFS="\n"} {if (match($1, " 1:N")) print $1,$2,$3,$4}' > W1_3.r1.fq ) \
+| awk 'BEGIN{FS="\t"; OFS="\n"} {if (match($1, " 2:N")) print $1,$2,$3,$4}' > W1_3.r2.fq
+
+paste - - - - < C3_2.fastq \
+| tee >(awk 'BEGIN{FS="\t"; OFS="\n"} {if (match($1, " 1:N")) print $1,$2,$3,$4}' > C3_2.r1.fq ) \
+| awk 'BEGIN{FS="\t"; OFS="\n"} {if (match($1, " 2:N")) print $1,$2,$3,$4}' > C3_2.r2.fq
+
+paste - - - - < C4_5.fastq \
+| tee >(awk 'BEGIN{FS="\t"; OFS="\n"} {if (match($1, " 1:N")) print $1,$2,$3,$4}' > C4_5.r1.fq ) \
+| awk 'BEGIN{FS="\t"; OFS="\n"} {if (match($1, " 2:N")) print $1,$2,$3,$4}' > C4_5.r2.fq
+
+paste - - - - < C5_5.fastq \
+| tee >(awk 'BEGIN{FS="\t"; OFS="\n"} {if (match($1, " 1:N")) print $1,$2,$3,$4}' > C5_5.r1.fq ) \
+| awk 'BEGIN{FS="\t"; OFS="\n"} {if (match($1, " 2:N")) print $1,$2,$3,$4}' > C5_5.r2.fq
+
+paste - - - - < W3_1.fastq \
+| tee >(awk 'BEGIN{FS="\t"; OFS="\n"} {if (match($1, " 1:N")) print $1,$2,$3,$4}' > W3_1.r1.fq ) \
+| awk 'BEGIN{FS="\t"; OFS="\n"} {if (match($1, " 2:N")) print $1,$2,$3,$4}' > W3_1.r2.fq
+
+paste - - - - < W4_3.fastq \
+| tee >(awk 'BEGIN{FS="\t"; OFS="\n"} {if (match($1, " 1:N")) print $1,$2,$3,$4}' > W4_3.r1.fq ) \
+| awk 'BEGIN{FS="\t"; OFS="\n"} {if (match($1, " 2:N")) print $1,$2,$3,$4}' > W4_3.r2.fq
+
+paste - - - - < W5_5.fastq \
+| tee >(awk 'BEGIN{FS="\t"; OFS="\n"} {if (match($1, " 1:N")) print $1,$2,$3,$4}' > W5_5.r1.fq ) \
+| awk 'BEGIN{FS="\t"; OFS="\n"} {if (match($1, " 2:N")) print $1,$2,$3,$4}' > W5_5.r2.fq
+
+################################################################################
+##step 3
+################################################################################
+##trim control metatranscriptome 
+
+trimmomatic PE C1_3.r1.fq C1_3.r2.fq C1_3_trimmed.r1_paired.fq C1_3_trimmed.r1_unpaired.fq C1_3_trimmed.r2_paired.fq C1_3_trimmed.r2_unpaired.fq ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:5 TRAILING:5 SLIDINGWINDOW:4:15 MINLEN:25
+
+trimmomatic PE W1_3.r1.fq W1_3.r2.fq W1_3_trimmed.r1_paired.fq W1_3_trimmed.r1_unpaired.fq W1_3_trimmed.r2_paired.fq W1_3_trimmed.r2_unpaired.fq ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:5 TRAILING:5 SLIDINGWINDOW:4:15 MINLEN:25
+
+trimmomatic PE C3_2.r1.fq C3_2.r2.fq C3_2_trimmed.r1_paired.fq C3_2_trimmed.r1_unpaired.fq C3_2_trimmed.r2_paired.fq C3_2_trimmed.r2_unpaired.fq ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:5 TRAILING:5 SLIDINGWINDOW:4:15 MINLEN:25
+
+trimmomatic PE C4_5.r1.fq C4_5.r2.fq C4_5_trimmed.r1_paired.fq C4_5_trimmed.r1_unpaired.fq C4_5_trimmed.r2_paired.fq C4_5_trimmed.r2_unpaired.fq ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:5 TRAILING:5 SLIDINGWINDOW:4:15 MINLEN:25
+
+trimmomatic PE C5_5.r1.fq C5_5.r2.fq C5_5_trimmed.r1_paired.fq C5_5_trimmed.r1_unpaired.fq C5_5_trimmed.r2_paired.fq C5_5_trimmed.r2_unpaired.fq ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:5 TRAILING:5 SLIDINGWINDOW:4:15 MINLEN:25
+
+trimmomatic PE W3_1.r1.fq W3_1.r2.fq W3_1_trimmed.r1_paired.fq W3_1_trimmed.r1_unpaired.fq W3_1_trimmed.r2_paired.fq W3_1_trimmed.r2_unpaired.fq ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:5 TRAILING:5 SLIDINGWINDOW:4:15 MINLEN:25
+
+trimmomatic PE W4_5.r1.fq W4_5.r2.fq W4_5_trimmed.r1_paired.fq W4_5_trimmed.r1_unpaired.fq W4_5_trimmed.r2_paired.fq W4_5_trimmed.r2_unpaired.fq ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:5 TRAILING:5 SLIDINGWINDOW:4:15 MINLEN:25
+
+trimmomatic PE W5_5.r1.fq W5_5.r2.fq W5_5_trimmed.r1_paired.fq W5_5_trimmed.r1_unpaired.fq W5_5_trimmed.r2_paired.fq W5_5_trimmed.r2_unpaired.fq ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:5 TRAILING:5 SLIDINGWINDOW:4:15 MINLEN:25
+
+check with fastqc
+
+fastqc C1_3_trimmed.r1_paired.fq
+fastqc C1_3_trimmed.r2_paired.fq
+
+##unzip Morteriella Control reference genome (downloaded filtered genome from JGI)
+
+gunzip < Morteriella_9C_4_filter.fastq.gz > Morteriella_9C_4_filter.fastq
+
+#transform fastq to fasta
+seqtk seq -a Morteriella_9C_4_filter.fastq > Morteriella_9C_4_filter.fasta
+
+#assembly Morteriella_9C_4_filter.fastq
+#first separate them in reverse and forward 
+
+paste - - - - < Morteriella_9C_4_filter.fastq \
+| tee >(awk 'BEGIN{FS="\t"; OFS="\n"} {if (match($1, " 1:N")) print $1,$2,$3,$4}' > Morteriella_9C_4.r1.fq ) \
+| awk 'BEGIN{FS="\t"; OFS="\n"} {if (match($1, " 2:N")) print $1,$2,$3,$4}' > Morteriella_9C_4.r2.fq
+
+
+paste - - - - < Penicillium_8C1_filter.fastq \
+| tee >(awk 'BEGIN{FS="\t"; OFS="\n"} {if (match($1, " 1:N")) print $1,$2,$3,$4}' > Penicillium_8C1.r1.fq ) \
+| awk 'BEGIN{FS="\t"; OFS="\n"} {if (match($1, " 2:N")) print $1,$2,$3,$4}' > Penicillium_8C1.r2.fq
+
+paste - - - - < Penicillium_3W1_filter.fq \
+| tee >(awk 'BEGIN{FS="\t"; OFS="\n"} {if (match($1, " 1:N")) print $1,$2,$3,$4}' > Penicillium_3W1.r1.fq ) \
+| awk 'BEGIN{FS="\t"; OFS="\n"} {if (match($1, " 2:N")) print $1,$2,$3,$4}' > Penicillium_3W1.r2.fq
+
+
+
+#trimmomatic of Whole genome 
+
+trimmomatic PE Morteriella_9C_4.r1.fq Morteriella_9C_4.r2.fq Morteriella_9C_4_trimmed.r1_paired.fq Morteriella_9C_4_trimmed.r1_unpaired.fq Morteriella_9C_4_trimmed.r2_paired.fq Morteriella_9C_4_trimmed.r2_unpaired.fq ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:5 TRAILING:5 SLIDINGWINDOW:4:15 MINLEN:25
+
+trimmomatic PE Penicillium_8C1.r1.fq Penicillium_8C1.r2.fq Penicillium_8C1_trimmed.r1_paired.fq Penicillium_8C1_trimmed.r1_unpaired.fq Penicillium_8C1_trimmed.r2_paired.fq Penicillium_8C1_trimmed.r2_unpaired.fq ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:5 TRAILING:5 SLIDINGWINDOW:4:15 MINLEN:25
+
+trimmomatic PE Penicillium_3W1.r1.fq Penicillium_3W1.r2.fq Penicillium_3W1_trimmed.r1_paired.fq Penicillium_3W1_trimmed.r1_unpaired.fq Penicillium_3W1_trimmed.r2_paired.fq Penicillium_3W1_trimmed.r2_unpaired.fq ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:5 TRAILING:5 SLIDINGWINDOW:4:15 MINLEN:25
+
+
+#trimmomatic of concatenated unpaired samples
+
+cat *concat_unpaired.fq > concatenated_Morteriella_unpaired.fastq
+
+cat *unpaired.fq > concatenated_Penicillium_unpaired.fastq
+
+##will use scaffolds file =>  Morteriella_9C_4_scaffolds.fasta
+
+##assembly draft genome of Morteriella 
+forward=/mnt/lustre/frey/adriluromero/Meta-wholegenomes/Morteriella_C/Morteriella_9C_4_trimmed.r1_paired.fq
+reverse=/mnt/lustre/frey/adriluromero/Meta-wholegenomes/Morteriella_C/Morteriella_9C_4_trimmed.r2_paired.fq
+unpaired=/mnt/lustre/frey/adriluromero/Meta-wholegenomes/Morteriella_C/concatenated_Morteriella_unpaired.fastq
+sample=Morteriella_9C_4
+
+echo running SPADES:
+echo srun spades.py -1 $forward -2 $reverse -s $unpaired -t 24 -o $dir/spades_assembly_$sample -m 400
+srun spades.py -1 $forward -2 $reverse -s $unpaired -t 24 -o spades_assembly_$sample -m 400
+#srun spades.py -o $dir/spades_assembly --continue -t 24 -m 400
+fasta=spades_assembly_$sample/contigs.fasta
+
+echo '#'running QUAST:
+echo mkdir QUAST_results
+echo srun quast.py -o QUAST_results/quast_$sample $fasta
+srun quast.py -o quast_$sample $fasta
+
+##try STAR - uses less memory than tophat #can't use "STAR" as name for dir, changed to STARdir and was ok
+##create index with assembled genome 
+#############################################################
+##use STAR to create index with assembled genome
+##############################################################
+
+STARdir=/mnt/lustre/frey/adriluromero/Meta-wholegenomes/Morteriella_C/STARdir
+STAR --runThreadN 20 --runMode genomeGenerate --genomeDir $STARdir \
+--genomeFastaFiles Morteriella_9C_4_scaffolds.fasta
+
+###########################################################
+##word count on files, must be the same number on r1 and r2 and must be divisible by 4
+##wc -l  
+###317912560 W1_3_trimmed.r1_paired.fq - divisible by 4 ok 
+###317912560 W1_3_trimmed.r2_paired.fq - same number as r1 and divisible by 4 so ok 
+###315812648 W3_1_trimmed.r1_paired.fq - divisible by 4
+###315812648 W3_1_trimmed.r2_paired.fq - same number as r1 and divisible by 4 so ok 
+###177294392 W4_3_trimmed.r1_paired.fq - divisible by 4 
+###177294392 W4_3_trimmed.r2_paired.fq - same number as r1 and divisible by 4 so ok 
+###281018888 W5_5_trimmed.r1_paired.fq - divisible by 4 so ok
+###281018888 W5_5_trimmed.r2_paired.fq - same number as r1 and divisible by 4 so ok 
+###236854712 C1_3_trimmed.r1_paired.fq - divisible by 4 so ok 
+###236854712 C1_3_trimmed.r2_paired.fq - same number as r1 and divisible by 4 so ok 
+###324752728 C4_5_trimmed.r1_paired.fq - divisible by 4 so ok 
+###324752728 C4_5_trimmed.r2_paired.fq - same number as r1 and divisible by 4 so ok 
+###287687504 C5_5_trimmed.r1_paired.fq - divisible by 4 so ok
+###287687504 C5_5_trimmed.r2_paired.fq - same number as r1 and divisible by 4 so ok 
+###295276680 C3_2_trimmed.r1_paired.fq - divisible by 4 so ok
+###295276680 C3_2_trimmed.r2_paired.fq - same number as r1 and divisible by 4 so ok 
+###########################################################
+
+
+###########################################################
+##step 4
+##decided to do separate alignments per plot for the sake of memory requirements
+###########################################################
+
+##align/map using STAR 
+##need to use option 2 pass mode because don't have annotation
+##control samples
+
+STARdir=/mnt/home/frey/adriluromero/Meta-wholegenomes/Morteriella_C/STARdir
+control_r1=/mnt/home/frey/adriluromero/Meta-wholegenomes/STAR_C3andW3/C3_2_trimmed.r1_paired.fq
+control_r2=/mnt/home/frey/adriluromero/Meta-wholegenomes/STAR_C3andW3/C3_2_trimmed.r2_paired.fq
+
+STAR --genomeDir $STARdir --readFilesIn $control_r1 $control_r2 \
+--outSAMunmapped Within \
+--outSAMtype BAM SortedByCoordinate --outSAMattrIHstart 0 \
+--outFilterIntronMotifs RemoveNoncanonical --runThreadN 24 \
+--twopassMode Basic
+
+
+STARdir=/mnt/home/frey/adriluromero/Meta-wholegenomes/Morteriella_C/STARdir
+control_r1=/mnt/home/frey/adriluromero/Meta-wholegenomes/STAR_C4andW4/C4_5_trimmed.r1_paired.fq
+control_r2=/mnt/home/frey/adriluromero/Meta-wholegenomes/STAR_C4andW4/C4_5_trimmed.r2_paired.fq
+
+STAR --genomeDir $STARdir --readFilesIn $control_r1 $control_r2 \
+--outSAMunmapped Within \
+--outSAMtype BAM SortedByCoordinate --outSAMattrIHstart 0 \
+--outFilterIntronMotifs RemoveNoncanonical --runThreadN 24 \
+--twopassMode Basic
+
+
+STARdir=/mnt/home/frey/adriluromero/Meta-wholegenomes/Morteriella_C/STARdir
+control_r1=/mnt/home/frey/adriluromero/Meta-wholegenomes/STAR_C5andW5/C5_5_trimmed.r1_paired.fq
+control_r2=/mnt/home/frey/adriluromero/Meta-wholegenomes/STAR_C5andW5/C5_5_trimmed.r2_paired.fq
+
+STAR --genomeDir $STARdir --readFilesIn $control_r1 $control_r2 \
+--outSAMunmapped Within \
+--outSAMtype BAM SortedByCoordinate --outSAMattrIHstart 0 \
+--outFilterIntronMotifs RemoveNoncanonical --runThreadN 24 \
+--twopassMode Basic
+
+##warmed samples 
+
+STARdir=/mnt/home/frey/adriluromero/Meta-wholegenomes/Morteriella_C/STARdir
+warmed_r1=/mnt/home/frey/adriluromero/Meta-wholegenomes/STAR_C3andW3/W3_1_trimmed.r1_paired.fq
+warmed_r2=/mnt/home/frey/adriluromero/Meta-wholegenomes/STAR_C3andW3/W3_1_trimmed.r2_paired.fq
+
+STAR --genomeDir $STARdir --readFilesIn $warmed_r1 $warmed_r2 \
+--outSAMunmapped Within \
+--outSAMtype BAM SortedByCoordinate --outSAMattrIHstart 0 \
+--outFilterIntronMotifs RemoveNoncanonical --runThreadN 24 \
+--twopassMode Basic
+
+
+STARdir=/mnt/home/frey/adriluromero/Meta-wholegenomes/Morteriella_C/STARdir
+warmed_r1=/mnt/home/frey/adriluromero/Meta-wholegenomes/STAR_C4andW4/W4_3_trimmed.r1_paired.fq
+warmed_r2=/mnt/home/frey/adriluromero/Meta-wholegenomes/STAR_C4andW4/W4_3_trimmed.r2_paired.fq
+
+STAR --genomeDir $STARdir --readFilesIn $warmed_r1 $warmed_r2 \
+--outSAMunmapped Within \
+--outSAMtype BAM SortedByCoordinate --outSAMattrIHstart 0 \
+--outFilterIntronMotifs RemoveNoncanonical --runThreadN 24 \
+--twopassMode Basic
+
+
+STARdir=/mnt/home/frey/adriluromero/Meta-wholegenomes/Morteriella_C/STARdir
+warmed_r1=/mnt/home/frey/adriluromero/Meta-wholegenomes/STAR_C5andW5/W5_5_trimmed.r1_paired.fq
+warmed_r2=/mnt/home/frey/adriluromero/Meta-wholegenomes/STAR_C5andW5/W5_5_trimmed.r2_paired.fq
+
+STAR --genomeDir $STARdir --readFilesIn $warmed_r1 $warmed_r2 \
+--outSAMunmapped Within \
+--outSAMtype BAM SortedByCoordinate --outSAMattrIHstart 0 \
+--outFilterIntronMotifs RemoveNoncanonical --runThreadN 24 \
+--twopassMode Basic
+
+###########################################################
+##step 5
+###########################################################
+##next cufflinks 
+##C and W sample (at the moment in dif directories)
+##do this separately for each C and W samples 
+
+cufflinks -p 20 --library-type fr-firststrand \
+Aligned.sortedByCoord.out.bam
+#(known and novel transcripts in file .gtf - transcripts.gtf)
+
+############################################################
+##step 6
+############################################################
+##cuffmerge
+##transcript and gene quantification (https://link.springer.com/content/pdf/10.1007%2F978-1-4939-4035-6.pdf)
+##concatenate annotation from C and W 
+
+echo C/transcripts.gtf > gtf.txt #gtf file product of Control metatranscriptome
+echo W/transcripts.gtf >> gtf.txt #gtf file product of Warmed metatranscriptome
+cuffmerge gtf.txt
+
+echo C4/transcripts.gtf > gtf.txt #gtf file product of Control metatranscriptome
+echo W4/transcripts.gtf >> gtf.txt #gtf file product of Warmed metatranscriptome
+cuffmerge gtf.txt
+
+echo C5/transcripts.gtf > gtf.txt #gtf file product of Control metatranscriptome
+echo W5/transcripts.gtf >> gtf.txt #gtf file product of Warmed metatranscriptome
+cuffmerge gtf.txt
+
+################################################################
+##step 7
+################################################################
+##cuffdiff
+
+cuffdiff -p 20 --library-type fr-firststrand merged_asm/merged.gtf W3/Aligned.sortedByCoord.out.bam C3/Aligned.sortedByCoord.out.bam
+
+cuffdiff -p 20 --library-type fr-firststrand merged_asm/merged.gtf W4/Aligned.sortedByCoord.out.bam C4/Aligned.sortedByCoord.out.bam
+
+cuffdiff -p 20 --library-type fr-firststrand merged_asm/merged.gtf W5/Aligned.sortedByCoord.out.bam C5/Aligned.sortedByCoord.out.bam
+
+################################################################
+##How many genes were detected as differentially expressed?
+################################################################
+
+grep -c "yes" gene_exp.diff 
+
+#################################################################
+#How many transcripts were differentially expressed between the two samples? 
+#################################################################
+
+grep -c "yes" isoform_exp.diff 
+
+#Count transcripts and identify them 
+#look at file genes.count.tracking to get gene counts 
+#look at gene.exp.diff to get id of each gene 
+#look at fasta file with genome
+
+##weird set of steps but need to do them for each sample
+
+samtools faidx Morteriella_7W_2_scaffolds.fasta 
+gffread -w transcripts.fa -g Morteriella_7W_2_scaffolds.fasta merged_asm/merged.gtf #if mistakes then run the perl script below
+perl cufftrim.pl Morteriella_7W_2_scaffolds.fasta.fai merged_asm/merged.gtf > transcripts_fixed.gtf
+gffread -w transcripts.fa -g Morteriella_7W_2_scaffolds.fasta transcripts_fixed.gtf
+
+##BLAST secuences and make list to connect with id 
+
+###################################################################
+###repeat everything with different reference genomes 
+###in my case Morteriella W, Penicillium C and Penicillium W
+###################################################################
+
+##MorteriellaW 
+##unzip Morteriella Warmed reference genome (downloaded filtered genome from JGI)
+
+gunzip < Morteriella_7W_2_filter.fastq.gz > Morteriella_7W_2_filter.fastq
+
+#transform fastq to fasta
+seqtk seq -a Morteriella_7W_2_filter.fastq > Morteriella_7W_2_filter.fasta
+
+#assembly Morteriella_7W_2_filter.fastq
+#first separate them in reverse and forward 
+
+paste - - - - < Morteriella_7W_2_filter.fastq \
+| tee >(awk 'BEGIN{FS="\t"; OFS="\n"} {if (match($1, " 1:N")) print $1,$2,$3,$4}' > Morteriella_7W_2.r1.fq ) \
+| awk 'BEGIN{FS="\t"; OFS="\n"} {if (match($1, " 2:N")) print $1,$2,$3,$4}' > Morteriella_7W_2.r2.fq
+
+#trimmomatic of Whole genome 
+
+trimmomatic PE Morteriella_7W_2.r1.fq Morteriella_7W_2.r2.fq Morteriella_7W_2_trimmed.r1_paired.fq Morteriella_7W_2_trimmed.r1_unpaired.fq Morteriella_7W_2_trimmed.r2_paired.fq Morteriella_7W_2_trimmed.r2_unpaired.fq ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:5 TRAILING:5 SLIDINGWINDOW:4:15 MINLEN:25
+
+#trimmomatic of concatenated unpaired samples
+
+cat *unpaired.fq > concatenated_Morteriella_unpaired.fastq
+
+##will use scaffolds file =>  Morteriella_9C_4_scaffolds.fasta ## downloaded from JGI
+
+##assembly draft genome of Morteriella 
+forward=/mnt/home/frey/adriluromero/Meta-wholegenomes/Morteriella_W/Morteriella_7W_2_trimmed.r1_paired.fq
+reverse=/mnt/home/frey/adriluromero/Meta-wholegenomes/Morteriella_W/Morteriella_7W_2_trimmed.r2_paired.fq
+unpaired=/mnt/home/frey/adriluromero/Meta-wholegenomes/Morteriella_W/concatenated_Morteriella_unpaired.fastq
+sample=Morteriella_7W_2
+
+echo running SPADES:
+echo srun spades.py -1 $forward -2 $reverse -s $unpaired -t 24 -o $dir/spades_assembly_$sample -m 400
+srun spades.py -1 $forward -2 $reverse -s $unpaired -t 24 -o spades_assembly_$sample -m 400
+#srun spades.py -o $dir/spades_assembly --continue -t 24 -m 400
+fasta=spades_assembly_$sample/contigs.fasta
+
+echo '#'running QUAST:
+echo mkdir QUAST_results
+echo srun quast.py -o QUAST_results/quast_$sample $fasta
+srun quast.py -o quast_$sample $fasta
+
+##try STAR - uses less memory than tophat #can't use "STAR" as name for dir, changed to STARdir and was ok
+##create index with assembled genome 
+###STAR with all samples
+
+STARdir=/mnt/lustre/frey/adriluromero/Meta-wholegenomes/Morteriella_C/STARdir
+STAR --runThreadN 20 --runMode genomeGenerate --genomeDir $STARdir \
+--genomeFastaFiles Morteriella_9C_4_scaffolds.fasta
+
+
+samtools faidx Morteriella_7W_2_scaffolds.fasta 
+gffread -w transcripts.fa -g Morteriella_7W_2_scaffolds.fasta merged_asm/merged.gtf #if mistakes then run the perl script below
+perl cufftrim.pl Morteriella_7W_2_scaffolds.fa.fai merged_asm/merged.gtf > transcripts_fixed.gtf
+gffread -w transcripts.fa -g Morteriella_7W_2_scaffolds.fasta transcripts_fixed.gtf
+
+
+
+samtools faidx Penicillium_8C1_scaffolds.fasta
+gffread -w transcripts.fa -g Penicillium_8C1_scaffolds.fasta merged_asm/merged.gtf #if mistakes then run the perl script below
+perl cufftrim.pl Penicillium_8C1_scaffolds.fasta.fai merged_asm/merged.gtf > transcripts_fixed.gtf
+gffread -w transcripts.fa -g Penicillium_8C1_scaffolds.fasta transcripts_fixed.gtf
+
+
+
+
